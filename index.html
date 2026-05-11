@@ -162,10 +162,6 @@
       background: white;
     }
 
-    .zoom-controls {
-      display: none;
-    }
-
     @media (max-width: 760px) {
       header {
         min-height: unset;
@@ -190,37 +186,6 @@
 
       .github-badge {
         padding: 5px 7px;
-      }
-
-      .zoom-controls {
-        display: flex;
-        position: absolute;
-        bottom: 14px;
-        right: 14px;
-        z-index: 10;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .zoom-controls button {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 1px solid #ccc;
-        background: white;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.18);
-        font-size: 22px;
-        line-height: 1;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #333;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      .zoom-controls button:active {
-        background: #f0f0f0;
       }
     }
   </style>
@@ -266,10 +231,6 @@
     <span class="status-hint" id="statusHint">Hover or tap a measurement</span>
   </div>
   <main class="viewer">
-    <div class="zoom-controls" id="zoomControls">
-      <button id="zoomIn"  aria-label="Zoom in">+</button>
-      <button id="zoomOut" aria-label="Zoom out">−</button>
-    </div>
     <object
       type="image/svg+xml"
       data="./Seamly2d-interactive-body-measurements.svg"
@@ -363,27 +324,144 @@
   })();
 
   (function () {
-    var BASE_W = 3003, BASE_H = 6402;
-    var STEPS = [0.25, 0.35, 0.5, 0.65, 0.8, 1.0];
-    var step = STEPS.indexOf(0.5);
-    var obj = document.querySelector('object');
+    if (!('ontouchstart' in window)) return;
 
-    function applyZoom() {
-      var s = STEPS[step];
-      obj.style.width  = Math.round(BASE_W * s) + 'px';
-      obj.style.height = Math.round(BASE_H * s) + 'px';
+    var SVG_W = 3003, SVG_H = 6402;
+    var viewer = document.querySelector('.viewer');
+    var obj    = document.querySelector('object');
+
+    // Switch viewer to a fixed canvas; object becomes absolutely positioned
+    viewer.style.overflow = 'hidden';
+    obj.style.position     = 'absolute';
+    obj.style.top          = '0';
+    obj.style.left         = '0';
+    obj.style.width        = SVG_W + 'px';
+    obj.style.height       = SVG_H + 'px';
+    obj.style.transformOrigin = '0 0';
+
+    var scale = 1, tx = 0, ty = 0;
+
+    function initFit() {
+      scale = Math.min(viewer.clientWidth / SVG_W, viewer.clientHeight / SVG_H);
+      tx = 0;
+      ty = 0;
+      commit();
     }
 
-    document.getElementById('zoomIn').addEventListener('click', function () {
-      if (step < STEPS.length - 1) { step++; applyZoom(); }
-    });
-    document.getElementById('zoomOut').addEventListener('click', function () {
-      if (step > 0) { step--; applyZoom(); }
+    function clamp() {
+      var sw = SVG_W * scale, sh = SVG_H * scale;
+      var vw = viewer.clientWidth,  vh = viewer.clientHeight;
+      var pad = 40;
+      tx = Math.min(vw - pad, Math.max(pad - sw, tx));
+      ty = Math.min(vh - pad, Math.max(pad - sh, ty));
+    }
+
+    function commit() {
+      obj.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+    }
+
+    initFit();
+
+    // Transparent overlay captures all touch events
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:absolute;inset:0;z-index:5;touch-action:none;';
+    viewer.appendChild(overlay);
+
+    var ptrs = {};
+    var panStartX, panStartY, panStartTx, panStartTy;
+    var pinchDist0 = 0, pinchScale0 = 1, pinchTx0 = 0, pinchTy0 = 0, pinchCx = 0, pinchCy = 0;
+    var tapX, tapY, tapTime;
+
+    function viewerPos(touch) {
+      var r = viewer.getBoundingClientRect();
+      return { x: touch.clientX - r.left, y: touch.clientY - r.top };
+    }
+
+    function dist2(a, b) { var dx = a.x - b.x, dy = a.y - b.y; return Math.sqrt(dx*dx + dy*dy); }
+    function mid(a, b)   { return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; }
+
+    overlay.addEventListener('touchstart', function (e) {
+      e.preventDefault();
+      Array.from(e.changedTouches).forEach(function (t) { ptrs[t.identifier] = viewerPos(t); });
+      var ids = Object.keys(ptrs);
+      if (ids.length === 1) {
+        var p = ptrs[ids[0]];
+        panStartX = p.x; panStartY = p.y; panStartTx = tx; panStartTy = ty;
+        tapX = p.x; tapY = p.y; tapTime = Date.now();
+      } else if (ids.length === 2) {
+        var pts = [ptrs[ids[0]], ptrs[ids[1]]];
+        pinchDist0  = dist2(pts[0], pts[1]);
+        pinchScale0 = scale;
+        pinchTx0 = tx; pinchTy0 = ty;
+        var c = mid(pts[0], pts[1]);
+        pinchCx = c.x; pinchCy = c.y;
+      }
+    }, { passive: false });
+
+    overlay.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+      Array.from(e.changedTouches).forEach(function (t) { ptrs[t.identifier] = viewerPos(t); });
+      var ids = Object.keys(ptrs);
+      if (ids.length === 1) {
+        var p = ptrs[ids[0]];
+        tx = panStartTx + (p.x - panStartX);
+        ty = panStartTy + (p.y - panStartY);
+        clamp(); commit();
+      } else if (ids.length >= 2) {
+        var pts = [ptrs[ids[0]], ptrs[ids[1]]];
+        var d = dist2(pts[0], pts[1]);
+        var newScale = Math.min(4, Math.max(0.15, pinchScale0 * (d / pinchDist0)));
+        // Zoom around the original pinch center
+        tx = pinchCx - (pinchCx - pinchTx0) * (newScale / pinchScale0);
+        ty = pinchCy - (pinchCy - pinchTy0) * (newScale / pinchScale0);
+        scale = newScale;
+        clamp(); commit();
+      }
+    }, { passive: false });
+
+    overlay.addEventListener('touchend', function (e) {
+      e.preventDefault();
+      var changed = Array.from(e.changedTouches);
+      var wasSingle = Object.keys(ptrs).length === 1;
+      changed.forEach(function (t) { delete ptrs[t.identifier]; });
+
+      if (wasSingle && changed.length === 1) {
+        var p = viewerPos(changed[0]);
+        var moved = dist2(p, { x: tapX, y: tapY });
+        if (moved < 10 && Date.now() - tapTime < 400) forwardTap(tapX, tapY);
+      }
+
+      // Re-anchor pan if one finger remains
+      var rem = Object.keys(ptrs);
+      if (rem.length === 1) {
+        var rp = ptrs[rem[0]];
+        panStartX = rp.x; panStartY = rp.y; panStartTx = tx; panStartTy = ty;
+      }
+    }, { passive: false });
+
+    overlay.addEventListener('touchcancel', function (e) {
+      Array.from(e.changedTouches).forEach(function (t) { delete ptrs[t.identifier]; });
     });
 
-    if (window.matchMedia('(max-width: 760px)').matches) {
-      step = STEPS.indexOf(0.35);
-      applyZoom();
+    function forwardTap(vx, vy) {
+      // Map visual viewer coords → SVG document coords
+      var docX = (vx - tx) / scale;
+      var docY = (vy - ty) / scale;
+      try {
+        var doc = obj.contentDocument;
+        if (!doc) return;
+        var el = doc.elementFromPoint(docX, docY);
+        while (el && el !== doc.documentElement) {
+          if (el.classList &&
+              (el.classList.contains('measure-definition') ||
+               el.classList.contains('measure-target'))) {
+            el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+            el.dispatchEvent(new MouseEvent('click',      { bubbles: true }));
+            return;
+          }
+          el = el.parentElement;
+        }
+      } catch (err) {}
     }
   })();
   </script>
