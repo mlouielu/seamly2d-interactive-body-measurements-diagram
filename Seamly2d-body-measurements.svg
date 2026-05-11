@@ -2,22 +2,22 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg2"
    version="1.1"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    width="33.369488in"
    height="71.128784in"
-   sodipodi:docname="Seamly2d-body-measurements-20230112.svg"
+   sodipodi:docname="Seamly2d-body-measurements_20260510.svg"
    inkscape:export-filename="C:\Users\susan\Downloads\Seamly2D-body-measurements.png"
    inkscape:export-xdpi="50"
-   inkscape:export-ydpi="50">
+   inkscape:export-ydpi="50"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <metadata
      id="metadata8">
     <rdf:RDF>
@@ -26,7 +26,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -312,6 +311,28 @@
          transform="scale(-0.6)"
          inkscape:connector-curvature="0" />
     </marker>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath1">
+      <rect
+         style="opacity:0.324704;fill:#ff0000;stroke-width:12.4039"
+         id="rect2"
+         width="85.299423"
+         height="68.23954"
+         x="1891.9432"
+         y="4295.2217" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3">
+      <rect
+         style="opacity:0.324704;fill:#800000;stroke:#800000;stroke-width:12.4039"
+         id="rect4"
+         width="59.479057"
+         height="69.622772"
+         x="1826.9312"
+         y="4292.9165" />
+    </clipPath>
   </defs>
   <sodipodi:namedview
      pagecolor="#ffffff"
@@ -322,16 +343,16 @@
      guidetolerance="10"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:window-width="1873"
-     inkscape:window-height="1041"
+     inkscape:window-width="1920"
+     inkscape:window-height="1080"
      id="ValentinaMeasurements"
      showgrid="false"
-     inkscape:zoom="0.47556277"
-     inkscape:cx="1745.8647"
-     inkscape:cy="1534.8755"
-     inkscape:window-x="32"
+     inkscape:zoom="0.95112554"
+     inkscape:cx="60.980383"
+     inkscape:cy="3952.6854"
+     inkscape:window-x="1280"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="layer2"
      fit-margin-left="1"
      fit-margin-top="1"
@@ -339,7 +360,11 @@
      fit-margin-bottom="1"
      units="in"
      showguides="false"
-     inkscape:guide-bbox="true" />
+     inkscape:guide-bbox="true"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="in" />
   <g
      inkscape:groupmode="layer"
      id="layer1"
@@ -5864,7 +5889,8 @@
            style="fill:none;stroke:#aaaaaa;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:7.5, 2.5;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#marker7359);marker-end:url(#marker7359)"
            d="m 1832,4339 c 9,8 33,11 50,11 39,0 54,-33 57,-56"
            id="path7705-8-8-6"
-           inkscape:connector-curvature="0" />
+           inkscape:connector-curvature="0"
+           clip-path="url(#clipPath3)" />
         <path
            sodipodi:nodetypes="csc"
            style="fill:none;stroke:#000000;stroke-width:2.68300009;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker7359);marker-end:url(#marker7359)"
@@ -5919,6 +5945,13 @@
              id="tspan18013-4"
              x="1949.7579"
              y="4232.5581">3</tspan></text>
+        <path
+           sodipodi:nodetypes="csc"
+           style="fill:none;stroke:#aaaaaa;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:7.5, 2.5;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#marker7359);marker-end:url(#marker7359)"
+           d="m 1832,4339 c 9,8 33,11 50,11 39,0 54,-33 57,-56"
+           id="path1"
+           inkscape:connector-curvature="0"
+           clip-path="url(#clipPath1)" />
       </g>
       <path
          sodipodi:nodetypes="cc"
@@ -15932,17 +15965,23 @@
            d="m 214.7,4442 124.2,1"
            style="fill:none;stroke:#dba981;stroke-width:1.20039999;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:3.6013, 1.2004;stroke-dashoffset:0;stroke-opacity:1" />
         <path
+           style="display:inline;fill:none;stroke:#000000;stroke-width:2.4186;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 314.7,4423 -71.8,1"
+           id="path4"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc" />
+        <path
            sodipodi:nodetypes="ccc"
            style="fill:none;stroke:#000000;stroke-width:2.41860008;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="m 303.4,4329 12.1,95 v 0"
            id="path4864"
            inkscape:connector-curvature="0" />
         <path
-           style="fill:none;stroke:#000000;stroke-width:2.41860008;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           d="m 314.7,4423 -71.8,1 m 0.8,-1 c -1.6,9 4.1,18 6.5,20"
+           style="fill:none;stroke:#000000;stroke-width:2.4186;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 243.7,4423 c -1.6,9 4.1,18 6.5,20"
            id="path4866"
            inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cccc" />
+           sodipodi:nodetypes="cc" />
         <path
            sodipodi:type="arc"
            style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
@@ -16282,5 +16321,6 @@
            height="286.62421"
            x="318.47134"
            y="2206.2761" /></flowRegion><flowPara
-         id="flowPara4067"></flowPara></flowRoot>  </g>
+         id="flowPara4067" /></flowRoot>
+  </g>
 </svg>
