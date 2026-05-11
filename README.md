@@ -25,6 +25,12 @@ This repository adapts the original SVG by adding:
 - click-to-copy measurement variable names on lines and labels
 
 
+## Mapping Editor & Interactive SVG script
+
+See: [Seamly2D Body Measurements Diagram ID-Path Mapping Editor
+](https://github.com/mlouielu/Seamly2D-body-measurements-diagram-ID-path-mapping-editor)
+
+
 ## License
 
 
