@@ -1,12 +1,18 @@
 Seamly2D Interactive Body Measurements Diagram
 ==============================================
 
-This repository contains an adapted/modified version of the Seamly2D body
-measurements diagram. The original work and this adaptation are licensed under
-the [Creative Commons Attribution-ShareAlike 4.0 International License][cc-by-sa].
+[![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
+
+
+Interactive Body Measurements Diagram: https://mlouielu.github.io/seamly2d-interactive-body-measurements-diagram/
+
 
 
 ## Attribution
+
+This repository contains an adapted/modified version of the Seamly2D body
+measurements diagram. The original work and this adaptation are licensed under
+the [Creative Commons Attribution-ShareAlike 4.0 International License][cc-by-sa].
 
 This project is based on:
 
@@ -34,7 +40,7 @@ See: [Seamly2D Body Measurements Diagram ID-Path Mapping Editor
 ## License
 
 
-[![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
+
 
 This work is licensed under a
 [Creative Commons Attribution-ShareAlike 4.0 International License][cc-by-sa].
