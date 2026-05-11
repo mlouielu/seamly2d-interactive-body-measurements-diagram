@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seamly2D Interactive Body Measurements Diagram</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #ddd;
+      background: #fafafa;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 6px 0 0;
+      color: #555;
+      font-size: 14px;
+    }
+
+    main {
+      height: calc(100vh - 72px);
+    }
+
+    object {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Seamly2D Interactive Body Measurements Diagram</h1>
+    <p>Hover measurements to highlight lines. Click a measurement to copy its variable name.</p>
+  </header>
+
+  <main>
+    <object
+      type="image/svg+xml"
+      data="./Seamly2d-interactive-body-measurements.svg"
+      aria-label="Interactive Seamly2D body measurements diagram">
+      <p>
+        Your browser could not load the SVG.
+        <a href="./Seamly2d-interactive-body-measurements.svg">Open it directly</a>.
+      </p>
+    </object>
+  </main>
+</body>
+</html>
