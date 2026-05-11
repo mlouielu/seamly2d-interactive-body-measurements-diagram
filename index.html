@@ -10,6 +10,8 @@
       height: 100%;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     header {
@@ -145,9 +147,11 @@
     }
 
     .viewer {
-      height: calc(100vh - 72px - 36px);
+      flex: 1;
+      min-height: 0;
       overflow: auto;
       background: #f3f3f3;
+      position: relative;
     }
 
     object {
@@ -158,14 +162,65 @@
       background: white;
     }
 
+    .zoom-controls {
+      display: none;
+    }
+
     @media (max-width: 760px) {
       header {
-        align-items: flex-start;
-        flex-direction: column;
+        min-height: unset;
+        padding: 5px 10px;
+        gap: 8px;
       }
 
-      .viewer {
-        height: calc(100vh - 116px - 36px);
+      h1 {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      p {
+        display: none;
+      }
+
+      .github-label {
+        display: none;
+      }
+
+      .github-badge {
+        padding: 5px 7px;
+      }
+
+      .zoom-controls {
+        display: flex;
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        z-index: 10;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .zoom-controls button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .zoom-controls button:active {
+        background: #f0f0f0;
       }
     }
   </style>
@@ -199,7 +254,7 @@
           0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013
           8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
         </svg>
-        GitHub
+        <span class="github-label">GitHub</span>
       </a>
     </div>
   </header>
@@ -211,6 +266,10 @@
     <span class="status-hint" id="statusHint">Hover or tap a measurement</span>
   </div>
   <main class="viewer">
+    <div class="zoom-controls" id="zoomControls">
+      <button id="zoomIn"  aria-label="Zoom in">+</button>
+      <button id="zoomOut" aria-label="Zoom out">−</button>
+    </div>
     <object
       type="image/svg+xml"
       data="./Seamly2d-interactive-body-measurements.svg"
@@ -301,6 +360,31 @@
     obj.addEventListener('load', function () { setTimeout(tryBridge, 100); });
     // Fallback if load already fired
     setTimeout(tryBridge, 500);
+  })();
+
+  (function () {
+    var BASE_W = 3003, BASE_H = 6402;
+    var STEPS = [0.25, 0.35, 0.5, 0.65, 0.8, 1.0];
+    var step = STEPS.indexOf(0.5);
+    var obj = document.querySelector('object');
+
+    function applyZoom() {
+      var s = STEPS[step];
+      obj.style.width  = Math.round(BASE_W * s) + 'px';
+      obj.style.height = Math.round(BASE_H * s) + 'px';
+    }
+
+    document.getElementById('zoomIn').addEventListener('click', function () {
+      if (step < STEPS.length - 1) { step++; applyZoom(); }
+    });
+    document.getElementById('zoomOut').addEventListener('click', function () {
+      if (step > 0) { step--; applyZoom(); }
+    });
+
+    if (window.matchMedia('(max-width: 760px)').matches) {
+      step = STEPS.indexOf(0.35);
+      applyZoom();
+    }
   })();
   </script>
 </body>
