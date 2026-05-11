@@ -72,8 +72,80 @@
       vertical-align: middle;
     }
 
+    .status-bar {
+      height: 36px;
+      box-sizing: border-box;
+      padding: 0 16px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #555;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      flex-shrink: 0;
+    }
+
+    .status-bar .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .status-bar.is-hovered .status-dot { background: #f59e0b; }
+    .status-bar.is-copied .status-dot  { background: #0a8f45; }
+
+    .status-bar .status-label {
+      font-weight: 600;
+      color: #111;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .status-bar .status-var {
+      font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+      font-size: 12px;
+      color: #555;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 1px 5px;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    .status-bar.is-hovered .status-var,
+    .status-bar.is-copied  .status-var { display: inline; }
+
+    .status-bar .status-sep {
+      color: #ccc;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    .status-bar.is-hovered .status-sep,
+    .status-bar.is-copied  .status-sep { display: inline; }
+
+    .status-bar .status-hint {
+      color: #999;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .status-bar.is-copied .status-hint {
+      color: #0a8f45;
+      font-weight: 600;
+    }
+
     .viewer {
-      height: calc(100vh - 72px);
+      height: calc(100vh - 72px - 36px);
       overflow: auto;
       background: #f3f3f3;
     }
@@ -93,7 +165,7 @@
       }
 
       .viewer {
-        height: calc(100vh - 116px);
+        height: calc(100vh - 116px - 36px);
       }
     }
   </style>
@@ -131,7 +203,13 @@
       </a>
     </div>
   </header>
-
+  <div class="status-bar" id="statusBar" aria-live="polite" aria-atomic="true">
+    <span class="status-dot"></span>
+    <span class="status-label" id="statusLabel"></span>
+    <span class="status-var" id="statusVar"></span>
+    <span class="status-sep">·</span>
+    <span class="status-hint" id="statusHint">Hover or tap a measurement</span>
+  </div>
   <main class="viewer">
     <object
       type="image/svg+xml"
@@ -143,5 +221,87 @@
       </p>
     </object>
   </main>
+  <script>
+  (function () {
+    const statusBar   = document.getElementById('statusBar');
+    const statusLabel = document.getElementById('statusLabel');
+    const statusVar   = document.getElementById('statusVar');
+    const statusHint  = document.getElementById('statusHint');
+    const obj         = document.querySelector('object');
+
+    const DEFAULT_HINT = 'Hover or tap a measurement';
+    const COPY_HINT    = '✓ Copied!';
+
+    let copyTimer  = null;
+    let savedState = { state: null, label: '', variable: '', hint: DEFAULT_HINT };
+
+    function applyState(s) {
+      savedState = s;
+      statusBar.className     = 'status-bar' + (s.state ? ' is-' + s.state : '');
+      statusLabel.textContent = s.label    || '';
+      statusVar.textContent   = s.variable || '';
+      statusHint.textContent  = s.hint     || DEFAULT_HINT;
+    }
+
+    function showCopied() {
+      if (copyTimer) clearTimeout(copyTimer);
+      statusBar.classList.remove('is-hovered');
+      statusBar.classList.add('is-copied');
+      statusHint.textContent = COPY_HINT;
+      copyTimer = setTimeout(function () { applyState(savedState); }, 1600);
+    }
+
+    function bridge(doc) {
+      function infoFor(el, code) {
+        const label    = el.getAttribute('data-measure-label') || code;
+        const variable = el.getAttribute('data-measure-var') ||
+          (label.match(/\(([^()]+)\)\s*$/) || [])[1] || '';
+        return { label, variable };
+      }
+
+      function codesFor(el) {
+        const raw = el.getAttribute('data-measures') || el.getAttribute('data-measure') || '';
+        return raw.trim().split(/\s+/).filter(Boolean);
+      }
+
+      doc.querySelectorAll('.measure-definition, .measure-target').forEach(function (el) {
+        const codes = codesFor(el);
+        if (!codes.length) return;
+        const code = codes[0];
+
+        el.addEventListener('mouseenter', function () {
+          const { label, variable } = infoFor(el, code);
+          applyState({ state: 'hovered', label, variable, hint: 'Click to copy variable' });
+        });
+
+        el.addEventListener('mouseleave', function () {
+          applyState({ state: null, label: '', variable: '', hint: DEFAULT_HINT });
+        });
+
+        el.addEventListener('click', function (evt) {
+          evt.stopPropagation();
+          const { label, variable } = infoFor(el, code);
+          applyState({ state: 'hovered', label, variable, hint: 'Click to copy variable' });
+          showCopied();
+        });
+      });
+    }
+
+    function tryBridge() {
+      try {
+        const doc = obj.contentDocument;
+        if (doc && doc.readyState === 'complete' && doc.querySelector('.measure-definition')) {
+          bridge(doc);
+          return;
+        }
+      } catch (e) {}
+      setTimeout(tryBridge, 200);
+    }
+
+    obj.addEventListener('load', function () { setTimeout(tryBridge, 100); });
+    // Fallback if load already fired
+    setTimeout(tryBridge, 500);
+  })();
+  </script>
 </body>
 </html>
