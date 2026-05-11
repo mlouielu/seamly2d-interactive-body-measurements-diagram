@@ -1,5 +1,5 @@
-Seamly2D Interactive Body Measurements Diagrams
-===============================================
+Seamly2D Interactive Body Measurements Diagram
+==============================================
 
 This repository contains an adapted/modified version of the Seamly2D body
 measurements diagram. The original work and this adaptation are licensed under
