@@ -451,8 +451,22 @@
           const { label, variable } = infoFor(el, code);
           applyState({ state: 'hovered', label, variable, hint: 'Click to copy variable' });
           showCopied();
+          history.replaceState(null, '', '#' + code);
         });
       });
+
+      /* Highlight element matching URL hash (e.g. #H03) on desktop */
+      function highlightFromHash() {
+        var hash = (location.hash || '').replace('#', '').toUpperCase().trim();
+        if (!/^[A-Q]\d+$/.test(hash)) return;
+        var el = doc.querySelector('[data-measure="' + hash + '"],[data-measures~="' + hash + '"]');
+        if (!el) return;
+        el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+
+      highlightFromHash();
+      window.addEventListener('hashchange', highlightFromHash);
     }
 
     function tryBridge() {
@@ -881,6 +895,10 @@
       if (found) found.scrollIntoView({ block: 'nearest' });
     }
 
+    function setHash(hash) {
+      history.replaceState(null, '', '#' + hash);
+    }
+
     function switchTabTo(letter) {
       if (letter === currentSection) return;
       currentSection = letter;
@@ -896,6 +914,7 @@
       var letter = code[0];
       /* Switch active tab without rebuilding the list (search results must stay) */
       switchTabTo(letter);
+      setHash(code);
       var isSecondTap = (code === lastTappedCode);
       lastTappedCode = isSecondTap ? null : code;
       try {
@@ -940,6 +959,7 @@
       if (active) active.scrollIntoView({ block: 'nearest', inline: 'center' });
       buildList(letter);
       fitSection(letter);
+      setHash(letter);
     }
 
     function forwardTap(vx, vy) {
@@ -983,7 +1003,22 @@
     function initSplitPanel(doc) {
       buildData(doc);
       buildTabs();
-      selectSection('A');
+
+      /* Restore from URL hash: #A → section, #A01 → specific measurement */
+      var initialHash = (location.hash || '').replace('#', '').toUpperCase().trim();
+      var initialCode = null;
+      if (/^[A-Q]\d+$/.test(initialHash)) {
+        initialCode = initialHash;
+        selectSection(initialHash[0]);
+      } else if (/^[A-Q]$/.test(initialHash) && sectionMeasurements[initialHash]) {
+        selectSection(initialHash);
+      } else {
+        selectSection('A');
+      }
+      if (initialCode) {
+        /* Defer so the SVG layout settles first */
+        setTimeout(function () { tapFromList(initialCode); }, 200);
+      }
 
       listSearch.addEventListener('input', function () {
         var q = listSearch.value.trim();
