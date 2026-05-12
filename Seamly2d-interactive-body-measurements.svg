@@ -1,4 +1,4 @@
-<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" version="1.1" inkscape:version="1.4.3 (0d15f75042, 2025-12-25)" width="33.369488in" height="71.128784in" sodipodi:docname="Seamly2d-body-measurements_20260510.svg" inkscape:export-filename="C:\Users\susan\Downloads\Seamly2D-body-measurements.png" inkscape:export-xdpi="50" inkscape:export-ydpi="50">
+<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" id="svg2" version="1.1" inkscape:version="1.4.3 (0d15f75042, 2025-12-25)" width="33.369488in" height="71.128784in" sodipodi:docname="Seamly2d-body-measurements.svg" inkscape:export-filename="C:\Users\susan\Downloads\Seamly2D-body-measurements.png" inkscape:export-xdpi="50" inkscape:export-ydpi="50">
   <style>
 .measure-definition {
   cursor: pointer;
@@ -432,9 +432,28 @@ tspan.measure-target.is-highlighted {
       <rect style="opacity:0.324704;fill:#800000;stroke:#800000;stroke-width:12.4039" id="rect4" width="59.479057" height="69.622772" x="1826.9312" y="4292.9165"/>
     </clipPath>
   </defs>
-  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="1" inkscape:pageshadow="2" inkscape:window-width="1920" inkscape:window-height="1080" id="ValentinaMeasurements" showgrid="false" inkscape:zoom="0.95112554" inkscape:cx="60.980383" inkscape:cy="3952.6854" inkscape:window-x="1280" inkscape:window-y="0" inkscape:window-maximized="1" inkscape:current-layer="layer2" fit-margin-left="1" fit-margin-top="1" fit-margin-right="1" fit-margin-bottom="1" units="in" showguides="false" inkscape:guide-bbox="true" inkscape:showpageshadow="2" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" inkscape:document-units="in"/>
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="1" inkscape:pageshadow="2" inkscape:window-width="1918" inkscape:window-height="1044" id="ValentinaMeasurements" showgrid="false" inkscape:zoom="0.33627366" inkscape:cx="917.40757" inkscape:cy="5672.4633" inkscape:window-x="1280" inkscape:window-y="17" inkscape:window-maximized="1" inkscape:current-layer="svg2" fit-margin-left="1" fit-margin-top="1" fit-margin-right="1" fit-margin-bottom="1" units="in" showguides="false" inkscape:guide-bbox="true" inkscape:showpageshadow="2" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" inkscape:document-units="in"/>
   <g inkscape:groupmode="layer" id="layer1" inkscape:label="Base" style="display:inline" transform="translate(3984.5523,-1519.1975)" sodipodi:insensitive="true">
     <rect style="fill:#ffffff;fill-opacity:1" id="rect5160" width="3103" height="6713" x="-78.860001" y="1465"/>
+  </g>
+  <g inkscape:groupmode="layer" id="layer3" inkscape:label="Bounding Box" style="display:none;fill:none" sodipodi:insensitive="true">
+    <rect style="display:inline;opacity:0.324704;fill:none;stroke:none;stroke-width:9.99999" id="rect1" width="1122.9222" height="770.43085" x="96.917496" y="94.16053" inkscape:label="A-bbox"/>
+    <rect style="display:inline;opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect3" width="538.30957" height="497.30554" x="1162.8328" y="94.16053" inkscape:label="B-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect5" width="425.2489" height="744.92902" x="1674.2317" y="94.16053" inkscape:label="C-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect6" width="657.39923" height="333.16162" x="96.917496" y="869.62451" inkscape:label="D-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect6-6" width="441.60461" height="333.06207" x="777.50287" y="870.39282" inkscape:label="E-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect6-6-5" width="863.87976" height="333.06207" x="1218.931" y="870.39282" inkscape:label="F-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect7" width="2001.9337" height="907.27051" x="96.917496" y="1230.4797" inkscape:label="G-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect8" width="1987.0649" height="693.09515" x="96.917503" y="2146.6741" inkscape:label="H-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect9" width="1888.9073" height="303.41507" x="96.917496" y="2991.4768" inkscape:label="I-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect10" width="1650.9348" height="282.60489" x="96.917496" y="3294.8918" inkscape:label="J-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect11" width="2016.8052" height="541.38757" x="96.917496" y="3634.0029" inkscape:label="K-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect12" width="1963.2738" height="398.60406" x="96.917496" y="4193.2383" inkscape:label="L-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect13" width="1130.3698" height="591.96832" x="96.917496" y="4659.9478" inkscape:label="M-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:9.99999" id="rect14" width="799.94373" height="600.70123" x="1228.9828" y="4659.9478" inkscape:label="N-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect15" width="1978.1471" height="571.13422" x="96.917496" y="5293.8613" inkscape:label="O-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:10" id="rect16" width="1936.5018" height="505.69174" x="96.917496" y="5873.9199" inkscape:label="P-bbox"/>
+    <rect style="opacity:0.324704;fill:none;stroke:none;stroke-width:9.99998" id="rect17" width="978.66223" height="377.7868" x="96.917496" y="6391.5103" inkscape:label="Q-bbox"/>
   </g>
   <g inkscape:groupmode="layer" id="layer2" inkscape:label="Graphics" style="display:inline" transform="translate(3984.5523,-1519.1975)">
     <rect style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:12.49291039;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" id="rect10797" width="3196.2131" height="6846.625" x="-3976.1411" y="1534.5801"/>
