@@ -789,10 +789,11 @@
         var letter = pair[0], name = pair[1];
         if (!sectionMeasurements[letter]) return;
         var btn = document.createElement('button');
+
         btn.className    = 'section-tab' + (letter === currentSection ? ' is-active' : '');
         btn.textContent  = name;
         btn.dataset.letter = letter;
-
+        btn.addEventListener('click', function () { selectSection(letter); });
         sectionTabs.appendChild(btn);
       });
     }
