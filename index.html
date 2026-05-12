@@ -146,6 +146,46 @@
       font-weight: 600;
     }
 
+    /* ── Section tabs (mobile only, shown by JS) ── */
+    .section-tabs {
+      display: none;
+      overflow-x: auto;
+      padding: 0 8px;
+      gap: 6px;
+      height: 46px;
+      box-sizing: border-box;
+      align-items: center;
+      background: #fafafa;
+      border-bottom: 1px solid #e0e0e0;
+      flex-shrink: 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .section-tabs::-webkit-scrollbar { display: none; }
+
+    .section-tab {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      padding: 0 12px;
+      border: 1px solid #ddd;
+      border-radius: 15px;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      color: #333;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .section-tab.is-active {
+      background: #1a73e8;
+      color: #fff;
+      border-color: #1a73e8;
+    }
+
     .viewer {
       flex: 1;
       min-height: 0;
@@ -160,6 +200,67 @@
       height: 6402px;
       border: 0;
       background: white;
+    }
+
+    /* ── Measurement list panel (mobile only, shown by JS) ── */
+    .list-panel {
+      display: none;
+      overflow-y: auto;
+      background: #fff;
+      border-top: 1px solid #e0e0e0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .list-loading {
+      padding: 20px 16px;
+      color: #999;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .list-item:active        { background: #f5f5f5; }
+    .list-item.is-highlighted { background: #fff3e0; }
+
+    .list-item-code {
+      font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+      font-size: 11px;
+      color: #aaa;
+      flex-shrink: 0;
+      width: 32px;
+    }
+
+    .list-item-name {
+      flex: 1;
+      font-size: 13px;
+      color: #111;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .list-item-var {
+      font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+      font-size: 11px;
+      color: #555;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 1px 5px;
+      flex-shrink: 0;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     @media (max-width: 760px) {
@@ -230,6 +331,7 @@
     <span class="status-sep">·</span>
     <span class="status-hint" id="statusHint">Hover or tap a measurement</span>
   </div>
+  <div class="section-tabs" id="sectionTabs"></div>
   <main class="viewer">
     <object
       type="image/svg+xml"
@@ -241,7 +343,11 @@
       </p>
     </object>
   </main>
+  <div class="list-panel" id="listPanel">
+    <div class="list-loading">Loading measurements…</div>
+  </div>
   <script>
+  /* ── Bridge: status bar ─────────────────────────────────────────────────── */
   (function () {
     const statusBar   = document.getElementById('statusBar');
     const statusLabel = document.getElementById('statusLabel');
@@ -318,39 +424,51 @@
       setTimeout(tryBridge, 200);
     }
 
+    window._svgBridge = { applyState: applyState };
+
     obj.addEventListener('load', function () { setTimeout(tryBridge, 100); });
-    // Fallback if load already fired
     setTimeout(tryBridge, 500);
   })();
 
+  /* ── Mobile: touch pan/zoom + split panel ───────────────────────────────── */
   (function () {
     if (!('ontouchstart' in window)) return;
 
-    var SVG_W = 3003, SVG_H = 6402;
-    var viewer = document.querySelector('.viewer');
-    var obj    = document.querySelector('object');
+    var SECTIONS = [
+      ['A', 'A - Direct Height'], ['B', 'B - Direct Width'], ['C', 'C - Indentation'],
+      ['D', 'D - Hand'],          ['E', 'E - Foot'],          ['F', 'F - Head'],
+      ['G', 'G - Circ'],          ['H', 'H - Vertical'],      ['I', 'I - Horizontal'],
+      ['J', 'J - Bust'],          ['K', 'K - Balance'],       ['L', 'L - Arm'],
+      ['M', 'M - Leg'],           ['N', 'N - Crotch'],        ['O', 'O - Corsage'],
+      ['P', 'P - Across'],        ['Q', 'Q - Dart']
+    ];
 
-    // Switch viewer to a fixed canvas; object becomes absolutely positioned
-    viewer.style.overflow = 'hidden';
-    obj.style.position     = 'absolute';
-    obj.style.top          = '0';
-    obj.style.left         = '0';
-    obj.style.width        = SVG_W + 'px';
-    obj.style.height       = SVG_H + 'px';
+    var SVG_W = 3003, SVG_H = 6802;
+    var viewer      = document.querySelector('.viewer');
+    var obj         = document.querySelector('object');
+    var sectionTabs = document.getElementById('sectionTabs');
+    var listPanel   = document.getElementById('listPanel');
+
+    /* Show split panel UI */
+    sectionTabs.style.display = 'flex';
+    listPanel.style.display   = 'block';
+    listPanel.style.flex      = '1';
+    listPanel.style.minHeight = '0';
+
+    /* Transform state */
+    viewer.style.overflow     = 'hidden';
+    obj.style.position        = 'absolute';
+    obj.style.top             = '0';
+    obj.style.left            = '0';
+    obj.style.width           = SVG_W + 'px';
+    obj.style.height          = SVG_H + 'px';
     obj.style.transformOrigin = '0 0';
 
     var scale = 1, tx = 0, ty = 0;
 
-    function initFit() {
-      scale = Math.min(viewer.clientWidth / SVG_W, viewer.clientHeight / SVG_H);
-      tx = 0;
-      ty = 0;
-      commit();
-    }
-
     function clamp() {
       var sw = SVG_W * scale, sh = SVG_H * scale;
-      var vw = viewer.clientWidth,  vh = viewer.clientHeight;
+      var vw = viewer.clientWidth, vh = viewer.clientHeight;
       var pad = 40;
       tx = Math.min(vw - pad, Math.max(pad - sw, tx));
       ty = Math.min(vh - pad, Math.max(pad - sh, ty));
@@ -360,9 +478,16 @@
       obj.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
     }
 
-    initFit();
+    function initFit() {
+      scale = Math.min(viewer.clientWidth / SVG_W, viewer.clientHeight / SVG_H);
+      tx = 0; ty = 0;
+      commit();
+    }
 
-    // Transparent overlay captures all touch events
+    /* Wait two frames so flexbox has split the viewer/list heights before measuring */
+    requestAnimationFrame(function () { requestAnimationFrame(initFit); });
+
+    /* Transparent overlay captures all touch events on the diagram */
     var overlay = document.createElement('div');
     overlay.style.cssText = 'position:absolute;inset:0;z-index:5;touch-action:none;';
     viewer.appendChild(overlay);
@@ -411,7 +536,6 @@
         var pts = [ptrs[ids[0]], ptrs[ids[1]]];
         var d = dist2(pts[0], pts[1]);
         var newScale = Math.min(4, Math.max(0.15, pinchScale0 * (d / pinchDist0)));
-        // Zoom around the original pinch center
         tx = pinchCx - (pinchCx - pinchTx0) * (newScale / pinchScale0);
         ty = pinchCy - (pinchCy - pinchTy0) * (newScale / pinchScale0);
         scale = newScale;
@@ -421,17 +545,17 @@
 
     overlay.addEventListener('touchend', function (e) {
       e.preventDefault();
-      var changed = Array.from(e.changedTouches);
-      var wasSingle = Object.keys(ptrs).length === 1;
+      var changed    = Array.from(e.changedTouches);
+      var wasSingle  = Object.keys(ptrs).length === 1;
       changed.forEach(function (t) { delete ptrs[t.identifier]; });
 
       if (wasSingle && changed.length === 1) {
         var p = viewerPos(changed[0]);
-        var moved = dist2(p, { x: tapX, y: tapY });
-        if (moved < 10 && Date.now() - tapTime < 400) forwardTap(tapX, tapY);
+        if (dist2(p, { x: tapX, y: tapY }) < 10 && Date.now() - tapTime < 400) {
+          forwardTap(tapX, tapY);
+        }
       }
 
-      // Re-anchor pan if one finger remains
       var rem = Object.keys(ptrs);
       if (rem.length === 1) {
         var rp = ptrs[rem[0]];
@@ -443,8 +567,266 @@
       Array.from(e.changedTouches).forEach(function (t) { delete ptrs[t.identifier]; });
     });
 
+    /* ── Split panel data ──────────────────────────────────────────────────── */
+    var sectionBBoxes       = {}; /* letter → {x,y,w,h} in SVG coords */
+    var sectionMeasurements = {}; /* letter → [{code,label,variable}]  */
+    var currentSection      = 'A';
+    var lastTappedCode      = null;
+
+    function getGlobalBBox(el, svgEl) {
+      var bb;
+      try { bb = el.getBBox(); } catch (e) { return null; }
+      if (!bb || (bb.width === 0 && bb.height === 0)) return null;
+      var ctm;
+      try { ctm = el.getCTM(); } catch (e) { return null; }
+      if (!ctm) return { x: bb.x, y: bb.y, width: bb.width, height: bb.height };
+      var corners = [
+        { x: bb.x,            y: bb.y            },
+        { x: bb.x + bb.width, y: bb.y            },
+        { x: bb.x,            y: bb.y + bb.height },
+        { x: bb.x + bb.width, y: bb.y + bb.height }
+      ].map(function (p) {
+        var pt = svgEl.createSVGPoint();
+        pt.x = p.x; pt.y = p.y;
+        return pt.matrixTransform(ctm);
+      });
+      var xs = corners.map(function (p) { return p.x; });
+      var ys = corners.map(function (p) { return p.y; });
+      return {
+        x:      Math.min.apply(null, xs),
+        y:      Math.min.apply(null, ys),
+        width:  Math.max.apply(null, xs) - Math.min.apply(null, xs),
+        height: Math.max.apply(null, ys) - Math.min.apply(null, ys)
+      };
+    }
+
+    function buildData(doc) {
+      var svgEl    = doc.documentElement;
+      var allEls   = doc.querySelectorAll('[data-measures],[data-measure]');
+      var bboxAccum = {};
+      var measSeen  = {};
+      var measData  = {};
+
+      allEls.forEach(function (el) {
+        var raw   = el.getAttribute('data-measures') || el.getAttribute('data-measure') || '';
+        var codes = raw.trim().split(/\s+/).filter(Boolean);
+        if (!codes.length) return;
+        var code   = codes[0];
+        var letter = code[0];
+
+        if (!measSeen[code]) {
+          measSeen[code] = true;
+          if (!measData[letter]) measData[letter] = [];
+          measData[letter].push({
+            code:     code,
+            label:    el.getAttribute('data-measure-label') || code,
+            variable: el.getAttribute('data-measure-var')   || ''
+          });
+        }
+
+        /* Only include measure-target elements in the bbox — measure-definition
+           elements are the right-side legend text and would inflate the crop. */
+        if (!el.classList.contains('measure-target')) return;
+
+        var bb = getGlobalBBox(el, svgEl);
+        if (!bb) return;
+        /* Use element center rather than full extent — long vertical/horizontal
+           measurement lines would otherwise pull the section bbox far beyond
+           the visible content cluster (e.g. H - Vertical spans full torso). */
+        var cx = bb.x + bb.width  / 2;
+        var cy = bb.y + bb.height / 2;
+        if (!bboxAccum[letter]) {
+          bboxAccum[letter] = { x1: cx, y1: cy, x2: cx, y2: cy };
+        } else {
+          var a = bboxAccum[letter];
+          a.x1 = Math.min(a.x1, cx);
+          a.y1 = Math.min(a.y1, cy);
+          a.x2 = Math.max(a.x2, cx);
+          a.y2 = Math.max(a.y2, cy);
+        }
+      });
+
+      Object.keys(measData).forEach(function (l) {
+        measData[l].sort(function (a, b) { return a.code < b.code ? -1 : 1; });
+      });
+
+      sectionMeasurements = measData;
+      Object.keys(bboxAccum).forEach(function (l) {
+        var a = bboxAccum[l];
+        sectionBBoxes[l] = { x: a.x1, y: a.y1, w: a.x2 - a.x1, h: a.y2 - a.y1 };
+      });
+    }
+
+    var debugRect = null;
+
+    function drawDebugBBox(letter) {
+      try {
+        var doc = obj.contentDocument;
+        if (!doc) return;
+        var svgEl = doc.documentElement;
+        if (!debugRect) {
+          debugRect = doc.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          debugRect.setAttribute('fill', 'none');
+          debugRect.setAttribute('stroke', '#ff0000');
+          debugRect.setAttribute('stroke-width', '8');
+          debugRect.setAttribute('stroke-dasharray', '20 10');
+          debugRect.setAttribute('pointer-events', 'none');
+          svgEl.appendChild(debugRect);
+        }
+        var bb = sectionBBoxes[letter];
+        if (!bb) { debugRect.style.display = 'none'; return; }
+        debugRect.style.display = '';
+        debugRect.setAttribute('x',      bb.x);
+        debugRect.setAttribute('y',      bb.y);
+        debugRect.setAttribute('width',  bb.w);
+        debugRect.setAttribute('height', bb.h);
+      } catch (e) {}
+    }
+
+    function fitSection(letter) {
+      var bb = sectionBBoxes[letter];
+      if (!bb) return;
+      var pad = 120;
+      var bx = bb.x - pad, by = bb.y - pad;
+      var bw = bb.w + pad * 2, bh = bb.h + pad * 2;
+      var vw = viewer.clientWidth, vh = viewer.clientHeight;
+      scale = Math.min(vw / bw, vh / bh);
+      tx = (vw - bw * scale) / 2 - bx * scale;
+      ty = (vh - bh * scale) / 2 - by * scale;
+      clamp();
+      commit();
+      // drawDebugBBox(letter);
+    }
+
+    var elementZoomed = false; /* true once user has tapped a list item in current section */
+
+    function panToElement(el, svgEl) {
+      var bb = getGlobalBBox(el, svgEl);
+      if (!bb) return;
+      var cx = bb.x + bb.width  / 2;
+      var cy = bb.y + bb.height / 2;
+      var sbb = sectionBBoxes[currentSection];
+
+      if (sbb) {
+        var vPad = 200;
+        scale = viewer.clientHeight / (sbb.h + vPad * 2);
+		ty = (viewer.clientHeight - (sbb.h + vPad * 2) * scale) / 2 - (sbb.y - vPad) * scale;
+      }
+      elementZoomed = true;
+
+      /* Always re-center on the element at the current scale */
+      tx = viewer.clientWidth  / 2 - cx * scale;
+      //ty = viewer.clientHeight / 2 - cy * scale;
+      clamp();
+      commit();
+    }
+
+    function buildTabs() {
+      sectionTabs.innerHTML = '';
+      SECTIONS.forEach(function (pair) {
+        var letter = pair[0], name = pair[1];
+        if (!sectionMeasurements[letter]) return;
+        var btn = document.createElement('button');
+        btn.className    = 'section-tab' + (letter === currentSection ? ' is-active' : '');
+        btn.textContent  = name;
+        btn.dataset.letter = letter;
+        btn.addEventListener('click', function () { selectSection(letter); });
+        sectionTabs.appendChild(btn);
+      });
+    }
+
+    function buildList(letter) {
+      listPanel.innerHTML = '';
+      var items = sectionMeasurements[letter] || [];
+      items.forEach(function (m) {
+        var displayName = m.label
+          .replace(/^[A-Z]\d+\s*[-–]\s*/, '')
+          .replace(/\s*\([^)]+\)\s*$/, '');
+
+        var row = document.createElement('div');
+        row.className    = 'list-item';
+        row.dataset.code = m.code;
+
+        var codeEl = document.createElement('span');
+        codeEl.className   = 'list-item-code';
+        codeEl.textContent = m.code;
+
+        var nameEl = document.createElement('span');
+        nameEl.className   = 'list-item-name';
+        nameEl.textContent = displayName;
+
+        row.appendChild(codeEl);
+        row.appendChild(nameEl);
+
+        if (m.variable) {
+          var varEl = document.createElement('span');
+          varEl.className   = 'list-item-var';
+          varEl.textContent = m.variable;
+          row.appendChild(varEl);
+        }
+
+        row.addEventListener('click', function () { tapFromList(m.code); });
+        listPanel.appendChild(row);
+      });
+    }
+
+    function highlightListItem(code) {
+      var found = null;
+      listPanel.querySelectorAll('.list-item').forEach(function (el) {
+        var active = el.dataset.code === code;
+        el.classList.toggle('is-highlighted', active);
+        if (active) found = el;
+      });
+      if (found) found.scrollIntoView({ block: 'nearest' });
+    }
+
+    function tapFromList(code) {
+      var isSecondTap = (code === lastTappedCode);
+      lastTappedCode = isSecondTap ? null : code;
+      try {
+        var doc = obj.contentDocument;
+        if (!doc) return;
+        /* Find the first geometric measure-target (not a text/legend element) */
+        var el = null;
+        var candidates = doc.querySelectorAll('[data-measure="' + code + '"],[data-measures~="' + code + '"]');
+        for (var i = 0; i < candidates.length; i++) {
+          var c = candidates[i];
+          var t = c.tagName.toLowerCase();
+          if (c.classList.contains('measure-target') && t !== 'text' && t !== 'tspan') {
+            el = c; break;
+          }
+        }
+        if (el) {
+          if (isSecondTap) {
+            el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          } else {
+            el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+            if (window._svgBridge) {
+              var label    = el.getAttribute('data-measure-label') || code;
+              var variable = el.getAttribute('data-measure-var')   || '';
+              window._svgBridge.applyState({ state: 'hovered', label: label, variable: variable, hint: 'Tap again to copy' });
+            }
+            panToElement(el, doc.documentElement);
+          }
+        }
+      } catch (err) {}
+      highlightListItem(code);
+    }
+
+    function selectSection(letter) {
+      currentSection = letter;
+      lastTappedCode = null;
+      elementZoomed  = false;
+      sectionTabs.querySelectorAll('.section-tab').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.dataset.letter === letter);
+      });
+      var active = sectionTabs.querySelector('.is-active');
+      if (active) active.scrollIntoView({ block: 'nearest', inline: 'center' });
+      buildList(letter);
+      fitSection(letter);
+    }
+
     function forwardTap(vx, vy) {
-      // Map visual viewer coords → SVG document coords
       var docX = (vx - tx) / scale;
       var docY = (vy - ty) / scale;
       try {
@@ -455,14 +837,52 @@
           if (el.classList &&
               (el.classList.contains('measure-definition') ||
                el.classList.contains('measure-target'))) {
-            el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-            el.dispatchEvent(new MouseEvent('click',      { bubbles: true }));
+            var code = (el.getAttribute('data-measures') || el.getAttribute('data-measure') || '')
+                        .trim().split(/\s+/)[0];
+            var isSecondTap = (code && code === lastTappedCode);
+            lastTappedCode = isSecondTap ? null : code;
+
+            if (isSecondTap) {
+              el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            } else {
+              el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+              if (window._svgBridge && code) {
+                var label    = el.getAttribute('data-measure-label') || code;
+                var variable = el.getAttribute('data-measure-var')   || '';
+                window._svgBridge.applyState({ state: 'hovered', label: label, variable: variable, hint: 'Tap again to copy' });
+              }
+              if (code) {
+                var letter = code[0];
+                if (letter !== currentSection) selectSection(letter);
+                highlightListItem(code);
+              }
+            }
             return;
           }
           el = el.parentElement;
         }
       } catch (err) {}
     }
+
+    function initSplitPanel(doc) {
+      buildData(doc);
+      buildTabs();
+      selectSection('A');
+    }
+
+    function tryInit() {
+      try {
+        var doc = obj.contentDocument;
+        if (doc && doc.readyState === 'complete' && doc.querySelector('.measure-definition')) {
+          initSplitPanel(doc);
+          return;
+        }
+      } catch (e) {}
+      setTimeout(tryInit, 200);
+    }
+
+    obj.addEventListener('load', function () { setTimeout(tryInit, 100); });
+    setTimeout(tryInit, 500);
   })();
   </script>
 </body>
