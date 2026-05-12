@@ -757,7 +757,7 @@
       ty = (vh - bh * scale) / 2 - by * scale;
       clamp();
       commit();
-      drawDebugBBox(letter);
+      // drawDebugBBox(letter);
     }
 
     var elementZoomed = false; /* true once user has tapped a list item in current section */
@@ -792,7 +792,7 @@
         btn.className    = 'section-tab' + (letter === currentSection ? ' is-active' : '');
         btn.textContent  = name;
         btn.dataset.letter = letter;
-        btn.addEventListener('click', function () { selectSection(letter); });
+
         sectionTabs.appendChild(btn);
       });
     }
