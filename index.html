@@ -197,7 +197,7 @@
     object {
       display: block;
       width: 3003px;
-      height: 6402px;
+      height: 6802px;
       border: 0;
       background: white;
     }
@@ -205,10 +205,47 @@
     /* ── Measurement list panel (mobile only, shown by JS) ── */
     .list-panel {
       display: none;
-      overflow-y: auto;
+      flex-direction: column;
       background: #fff;
       border-top: 1px solid #e0e0e0;
+    }
+
+    .list-search-wrap {
+      flex-shrink: 0;
+      padding: 6px 10px;
+      background: #fafafa;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .list-search {
+      width: 100%;
+      box-sizing: border-box;
+      height: 32px;
+      padding: 0 10px;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .list-search:focus { border-color: #1a73e8; }
+
+    .list-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+    }
+
+    .list-search-section {
+      font-size: 11px;
+      font-weight: 600;
+      color: #888;
+      padding: 8px 14px 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .list-loading {
@@ -344,7 +381,12 @@
     </object>
   </main>
   <div class="list-panel" id="listPanel">
-    <div class="list-loading">Loading measurements…</div>
+    <div class="list-search-wrap">
+      <input class="list-search" id="listSearch" type="search" placeholder="Search measurements…" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="list-scroll" id="listScroll">
+      <div class="list-loading">Loading measurements…</div>
+    </div>
   </div>
   <script>
   /* ── Bridge: status bar ─────────────────────────────────────────────────── */
@@ -448,11 +490,14 @@
     var obj         = document.querySelector('object');
     var sectionTabs = document.getElementById('sectionTabs');
     var listPanel   = document.getElementById('listPanel');
+    var listScroll  = document.getElementById('listScroll');
+    var listSearch  = document.getElementById('listSearch');
 
     /* Show split panel UI */
     sectionTabs.style.display = 'flex';
-    listPanel.style.display   = 'block';
-    listPanel.style.flex      = '1';
+    viewer.style.flex         = '3';  /* diagram takes 3 parts */
+    listPanel.style.display   = 'flex';
+    listPanel.style.flex      = '2';  /* list takes 2 parts  → 60/40 split */
     listPanel.style.minHeight = '0';
 
     /* Transform state */
@@ -708,7 +753,7 @@
       var sbb = sectionBBoxes[currentSection];
 
       if (sbb) {
-        var vPad = 200;
+        var vPad = viewer.clientHeight * 0.32;
         scale = viewer.clientHeight / (sbb.h + vPad * 2);
 		ty = (viewer.clientHeight - (sbb.h + vPad * 2) * scale) / 2 - (sbb.y - vPad) * scale;
       }
@@ -735,44 +780,82 @@
       });
     }
 
+    function makeListRow(m) {
+      var displayName = m.label
+        .replace(/^[A-Z]\d+\s*[-–]\s*/, '')
+        .replace(/\s*\([^)]+\)\s*$/, '');
+
+      var row = document.createElement('div');
+      row.className    = 'list-item';
+      row.dataset.code = m.code;
+
+      var codeEl = document.createElement('span');
+      codeEl.className   = 'list-item-code';
+      codeEl.textContent = m.code;
+
+      var nameEl = document.createElement('span');
+      nameEl.className   = 'list-item-name';
+      nameEl.textContent = displayName;
+
+      row.appendChild(codeEl);
+      row.appendChild(nameEl);
+
+      if (m.variable) {
+        var varEl = document.createElement('span');
+        varEl.className   = 'list-item-var';
+        varEl.textContent = m.variable;
+        row.appendChild(varEl);
+      }
+
+      row.addEventListener('click', function () { tapFromList(m.code); });
+      return row;
+    }
+
     function buildList(letter) {
-      listPanel.innerHTML = '';
+      listScroll.innerHTML = '';
       var items = sectionMeasurements[letter] || [];
-      items.forEach(function (m) {
-        var displayName = m.label
-          .replace(/^[A-Z]\d+\s*[-–]\s*/, '')
-          .replace(/\s*\([^)]+\)\s*$/, '');
+      items.forEach(function (m) { listScroll.appendChild(makeListRow(m)); });
+    }
 
-        var row = document.createElement('div');
-        row.className    = 'list-item';
-        row.dataset.code = m.code;
-
-        var codeEl = document.createElement('span');
-        codeEl.className   = 'list-item-code';
-        codeEl.textContent = m.code;
-
-        var nameEl = document.createElement('span');
-        nameEl.className   = 'list-item-name';
-        nameEl.textContent = displayName;
-
-        row.appendChild(codeEl);
-        row.appendChild(nameEl);
-
-        if (m.variable) {
-          var varEl = document.createElement('span');
-          varEl.className   = 'list-item-var';
-          varEl.textContent = m.variable;
-          row.appendChild(varEl);
-        }
-
-        row.addEventListener('click', function () { tapFromList(m.code); });
-        listPanel.appendChild(row);
+    function buildSearchResults(query) {
+      listScroll.innerHTML = '';
+      var q = query.toLowerCase();
+      var grouped = {};
+      SECTIONS.forEach(function (pair) {
+        var letter = pair[0];
+        var items  = sectionMeasurements[letter] || [];
+        items.forEach(function (m) {
+          var haystack = (m.code + ' ' + m.label + ' ' + m.variable).toLowerCase();
+          if (haystack.indexOf(q) === -1) return;
+          if (!grouped[letter]) grouped[letter] = [];
+          grouped[letter].push(m);
+        });
       });
+
+      var hasResults = false;
+      SECTIONS.forEach(function (pair) {
+        var letter = pair[0], name = pair[1];
+        var items = grouped[letter];
+        if (!items || !items.length) return;
+        hasResults = true;
+        var hdr = document.createElement('div');
+        hdr.className   = 'list-search-section';
+        hdr.textContent = name;
+        listScroll.appendChild(hdr);
+        items.forEach(function (m) { listScroll.appendChild(makeListRow(m)); });
+      });
+
+      if (!hasResults) {
+        var empty = document.createElement('div');
+        empty.className   = 'list-loading';
+        empty.textContent = 'No results';
+        listScroll.appendChild(empty);
+      }
     }
 
     function highlightListItem(code) {
       var found = null;
-      listPanel.querySelectorAll('.list-item').forEach(function (el) {
+      listScroll.querySelectorAll('.list-item').forEach(function (el) {
         var active = el.dataset.code === code;
         el.classList.toggle('is-highlighted', active);
         if (active) found = el;
@@ -780,7 +863,21 @@
       if (found) found.scrollIntoView({ block: 'nearest' });
     }
 
+    function switchTabTo(letter) {
+      if (letter === currentSection) return;
+      currentSection = letter;
+      elementZoomed  = false;
+      sectionTabs.querySelectorAll('.section-tab').forEach(function (btn) {
+        btn.classList.toggle('is-active', btn.dataset.letter === letter);
+      });
+      var active = sectionTabs.querySelector('.is-active');
+      if (active) active.scrollIntoView({ block: 'nearest', inline: 'center' });
+    }
+
     function tapFromList(code) {
+      var letter = code[0];
+      /* Switch active tab without rebuilding the list (search results must stay) */
+      switchTabTo(letter);
       var isSecondTap = (code === lastTappedCode);
       lastTappedCode = isSecondTap ? null : code;
       try {
@@ -817,6 +914,7 @@
       currentSection = letter;
       lastTappedCode = null;
       elementZoomed  = false;
+      listSearch.value = '';
       sectionTabs.querySelectorAll('.section-tab').forEach(function (btn) {
         btn.classList.toggle('is-active', btn.dataset.letter === letter);
       });
@@ -868,6 +966,15 @@
       buildData(doc);
       buildTabs();
       selectSection('A');
+
+      listSearch.addEventListener('input', function () {
+        var q = listSearch.value.trim();
+        if (q) {
+          buildSearchResults(q);
+        } else {
+          buildList(currentSection);
+        }
+      });
     }
 
     function tryInit() {
