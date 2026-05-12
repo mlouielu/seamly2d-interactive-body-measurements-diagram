@@ -696,9 +696,25 @@
       });
 
       sectionMeasurements = measData;
-      Object.keys(bboxAccum).forEach(function (l) {
+
+      /* Build a map from inkscape:label → element for bbox markers. */
+      var inkNS = 'http://www.inkscape.org/namespaces/inkscape';
+      var labelMap = {};
+      doc.querySelectorAll('[*|label]').forEach(function(el) {
+        var lbl = el.getAttributeNS(inkNS, 'label') || el.getAttribute('inkscape:label');
+        if (lbl) labelMap[lbl] = el;
+      });
+
+      /* Prefer explicit {letter}-bbox elements authored in the SVG; fall back
+         to the computed centroid accumulation for any section missing one. */
+      Object.keys(measData).forEach(function (l) {
+        var marker = labelMap[l + '-bbox'];
+        if (marker) {
+          var bb = getGlobalBBox(marker, svgEl);
+          if (bb) { sectionBBoxes[l] = { x: bb.x, y: bb.y, w: bb.width, h: bb.height }; return; }
+        }
         var a = bboxAccum[l];
-        sectionBBoxes[l] = { x: a.x1, y: a.y1, w: a.x2 - a.x1, h: a.y2 - a.y1 };
+        if (a) sectionBBoxes[l] = { x: a.x1, y: a.y1, w: a.x2 - a.x1, h: a.y2 - a.y1 };
       });
     }
 
@@ -731,7 +747,8 @@
     function fitSection(letter) {
       var bb = sectionBBoxes[letter];
       if (!bb) return;
-      var pad = 120;
+
+      var pad = viewer.clientHeight * 0.05;
       var bx = bb.x - pad, by = bb.y - pad;
       var bw = bb.w + pad * 2, bh = bb.h + pad * 2;
       var vw = viewer.clientWidth, vh = viewer.clientHeight;
@@ -740,7 +757,7 @@
       ty = (vh - bh * scale) / 2 - by * scale;
       clamp();
       commit();
-      // drawDebugBBox(letter);
+      drawDebugBBox(letter);
     }
 
     var elementZoomed = false; /* true once user has tapped a list item in current section */
@@ -753,7 +770,7 @@
       var sbb = sectionBBoxes[currentSection];
 
       if (sbb) {
-        var vPad = viewer.clientHeight * 0.32;
+        var vPad = bb.height / viewer.clientHeight + viewer.clientHeight * 0.1;
         scale = viewer.clientHeight / (sbb.h + vPad * 2);
 		ty = (viewer.clientHeight - (sbb.h + vPad * 2) * scale) / 2 - (sbb.y - vPad) * scale;
       }
