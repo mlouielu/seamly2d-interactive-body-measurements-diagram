@@ -1,0 +1,3 @@
+[submodule "mapping-editor"]
+	path = mapping-editor
+	url = git@github.com:mlouielu/Seamly2D-body-measurements-diagram-ID-path-mapping-editor.git
